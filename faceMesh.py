@@ -6,45 +6,50 @@ sys.path.insert(1, p)
 
 import cv2
 import mediapipe as mp
-from utils.utils import create_dir, save_json, load_json, setup_logging
+from utils.utils import setup_logging
 
 
+logger = setup_logging()
+class FaceMesh():
+    def __init__(self, static_mode=False, maxFaces=1, min_detection_conf=0.5, min_track_conf=0.5):
+        super(FaceMesh, self).__init__()
+        """uses media pipe's api to detect face mesh points
 
-# create the FaceMesh object 
-mp_face_mesh = mp.solutions.face_mesh
-face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True)
-
-# read the video or camera
-video_path = "data/news.mp4"    # 0:webcam, or video path
-cap = cv2.VideoCapture(video_path)
-if isinstance(video_path, int):
-    save_dir = "data/detected_mesh/webcam"
-else:
-    save_dir =  "data/detected_mesh/{}".format(
-        video_path.split(".")[0].split("/")[-1])
-
-create_dir(save_dir)
-if isinstance(video_path, int):
-    frame_width = int(cap.get(3))
-    frame_height = int(cap.get(4))
-
-    out = cv2.VideoWriter(
-        'data/webcam.avi',
-        cv2.VideoWriter_fourcc('M','J','P','G'), 
-        30, (frame_width,frame_height)
-    )
-
-frame_counter = 0
-while True:
-    ret, frame = cap.read()
-    if isinstance(video_path, int):
-        out.write(frame)
+            Args:
+                static_mode (bool): whether track or just detect everytime
+                maxFaces (int): number of faces to be detected
+        """
         
-    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    
-    if ret:
+        self.static_mode = static_mode
+        self.maxFaces = maxFaces
+        self.min_detection_conf = min_detection_conf
+        self.min_track_conf = min_track_conf
+        
+        # create the FaceMesh object 
+        self.mp_face_mesh = mp.solutions.face_mesh
+        self.face_mesh = self.mp_face_mesh.FaceMesh(
+            static_image_mode=self.static_mode,
+            max_num_faces=self.maxFaces,
+            min_detection_confidence=self.min_detection_conf,
+            min_tracking_confidence=self.min_track_conf)
+
+
+    def get_mesh(self, cv_img, draw=True):
+        """return the face messh of opencv image
+
+        Args:
+            cv_img (cv2Image): opencv Image to be processed
+            draw (bool): whether to draw the mesh on the image or not
+        
+        Returns:
+            coord (json): 2D & 2D coordinates of the mesh points
+            img (cv2Image): the input image with the face mesh
+        """
+        
+        rgb_frame = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+        # if ret:
         image_mesh = {}
-        mesh_results = face_mesh.process(rgb_frame)
+        mesh_results = self.face_mesh.process(rgb_frame)
         
         # if any detected face with mesh
         if mesh_results.multi_face_landmarks:
@@ -67,27 +72,17 @@ while True:
                     # append the points to save 
                     x_y_coordinate.append([x, y])
                     x_y_z_coordinate.append([landmark.x, landmark.y, landmark.z])
-                    cv2.putText(frame, ".", (x,y), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1) 
+                    if draw:
+                        cv2.putText(cv_img, ".", (x,y), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1) 
                     
                 x_y_coordinates["face_{}".format(idx)] = x_y_coordinate
                 x_y_z_coordinates["face_{}".format(idx)] = x_y_z_coordinate
-            
-            key = save_dir.split("/")[-1]
-            image_mesh[key] = {
-                "2d_points": x_y_coordinates,
-                "3d_points":x_y_z_coordinates
-            }
-            
-            save_json("{}/frame_{}.json".format(save_dir, frame_counter), image_mesh)    
-        cv2.imshow("raw frame", frame)
-        frame_counter += 1
-        key = cv2.waitKey(25)
-        if key == 27:
-            break
-    
-    else:
-        continue
-cap.release()
+            image_mesh = {"2d_points": x_y_coordinates, "3d_points":x_y_z_coordinates}
+        return image_mesh, cv_img
+
+
+
+
     
     
     
