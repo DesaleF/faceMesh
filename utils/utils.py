@@ -1,33 +1,47 @@
 import os
 import json
-import yaml
 import logging
+import colorlog
 
 
 # ++++++++++++++++++ # 
 ##  setup logging   ##
 # ++++++++++++++++++ # 
 log=logging.getLogger()
-def setup_logging(default_path='logging.yaml', default_level=logging.DEBUG, env_key='LOG_CFG'):
+def setup_logging(folder="log", filename="log_info.log", default_level=logging.DEBUG):
     """Setup logging configuratio
 
     Args:
-        default_path (str, optional): config file path. Defaults to 'logging.yaml'.
-        default_level ([type], optional): logging level. Defaults to logging.DEBUG.
-        env_key (str, optional): . Defaults to 'LOG_CFG'.
+        folder (str, optional): path to save logs. default log.
+        filename (str, optional): filenames to save the logs.
     """
-    path = default_path
-    value = os.getenv(env_key, None)
-    if value:
-        path = value
-    
-    if os.path.exists(path):
-        with open(path, 'rt') as f:
-            config = yaml.safe_load(f.read())
-    
-        logging.config.dictConfig(config)
-    else:
-        logging.basicConfig(level=default_level)
+
+    log_colors = {
+        'DEBUG': 'blue',
+        'INFO': 'white',
+        'WARNING': 'green',
+        'ERROR': 'red',
+        'CRITICAL': 'yellow',
+    }
+    logger = logging.getLogger('FACEMESH')
+    LOGFORMAT = "%(log_color)s%(asctime)s [%(log_color)s%(filename)s:%(lineno)d] | %(log_color)s%(message)s%(reset)s |"
+    LOG_LEVEL = default_level
+    if not os.path.isdir(folder):
+        os.makedirs(folder)
+        
+    logging.root.setLevel(LOG_LEVEL)
+    stream = logging.StreamHandler()
+    stream.setLevel(LOG_LEVEL)
+    stream.setFormatter(colorlog.ColoredFormatter(LOGFORMAT, datefmt='%d %H:%M', log_colors=log_colors))
+
+    # print to log file
+    hdlr = logging.FileHandler(os.path.join(folder, filename))
+    hdlr.setLevel(LOG_LEVEL)
+    hdlr.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
+
+    logger.addHandler(hdlr)
+    logger.addHandler(stream)
+    return logger
 
 
 # +++++++++++++++++++ # 
