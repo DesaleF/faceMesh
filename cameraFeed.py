@@ -18,11 +18,11 @@ class Camera:
             self.source = cv2.VideoCapture(0)
         
         while True:
-            ret_val, img = self.source.read()
-            if self.mirror: 
+            ret, img = self.source.read()
+            if ret and self.mirror: 
                 img = cv2.flip(img, 1)
                 
-            if self.resize:
+            if ret and self.resize:
                 img = cv2.resize(img, (self.width, self.height), 
                         interpolation=cv2.INTER_AREA)
             

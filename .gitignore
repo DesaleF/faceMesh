@@ -5,3 +5,4 @@ data/detected_mesh/*
 log/log_info.log
 data/webcam.avi
 test.py
+utils/__pycache__/utils.cpython-38.pyc

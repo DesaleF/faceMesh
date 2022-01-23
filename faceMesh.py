@@ -101,12 +101,14 @@ class FaceMesh():
                     if len(x_y_coordinate) < 468:
                         x_y_coordinate.append([x, y])
                         x_y_z_coordinate.append([landmark.x, landmark.y, landmark.z])
+                    
                         if draw:
                            cv2.putText(cv_img, ".", (x,y), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1) 
-
+                    
+                    # those are the iris points 
                     else:
                         x_y_iris.append([x, y])
-                        
+                
                 if draw and landmarks.landmark:  
                     left_i = np.array(x_y_iris[:5])
                     right_i = np.array(x_y_iris[5:])               

@@ -64,6 +64,7 @@ def main(root_dir='data/detected_mesh'):
         # save the mesh and display the video
         save_json(json_file_name, face_mesh)    
         frame_counter += 1
+        
         cv2.imshow('Face Mesh', img)
         cv2.namedWindow('Face Mesh',cv2.WINDOW_NORMAL)
         if cv2.waitKey(30) == 27: 
