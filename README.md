@@ -47,6 +47,12 @@ File struecture structure:
 └── README.md
 ```
 
+## Dependency
+mediapipe==0.8.9.1
+```
+$ pip install mediapipe
+```
 ## Resources
+
 [Mediapipe](https://google.github.io/mediapipe/solutions/face_mesh.html)
                

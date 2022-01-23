@@ -2,9 +2,10 @@
 Simply display the contents of the webcam with optional mirroring using OpenCV 
 via the new Pythonic cv2 interface.  Press <esc> to quit.
 """
-from tkinter.messagebox import NO
 import cv2
 from utils.utils import setup_logging
+
+
 
 logger = setup_logging()
 class Video:
