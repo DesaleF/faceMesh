@@ -7,8 +7,12 @@ from videoFeed import Video
 
 
 
+LEFT_IRIS = [474,475, 476, 477]
+RIGHT_IRIS = [469, 470, 471, 472]
+
 logger = setup_logging()
 def main():
+    
     # read the video or camera
     args = drawArgs()
     faceMesh = FaceMesh(static_mode=False)

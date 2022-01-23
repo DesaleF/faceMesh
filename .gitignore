@@ -1,3 +1,7 @@
 *__pycache__*
 data/detected_mesh/*
 
+*/__pycache__
+log/log_info.log
+data/webcam.avi
+test.py
